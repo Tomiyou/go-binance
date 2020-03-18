@@ -86,3 +86,78 @@ type Deposit struct {
 	Status     int     `json:"status"`
 	TxID       string  `json:"txId"`
 }
+
+// GetDepositAddressService list deposits
+type GetDepositAddressService struct {
+	c          *Client
+	asset      *string
+	status     *bool
+	recvWindow *int64
+	timestamp  *int64
+}
+
+// Asset set asset
+func (s *GetDepositAddressService) Asset(asset string) *GetDepositAddressService {
+	s.asset = &asset
+	return s
+}
+
+// Status set status
+func (s *GetDepositAddressService) Status(status bool) *GetDepositAddressService {
+	s.status = &status
+	return s
+}
+
+// ReceiveWindow set recvWindow
+func (s *GetDepositAddressService) ReceiveWindow(recvWindow int64) *GetDepositAddressService {
+	s.recvWindow = &recvWindow
+	return s
+}
+
+// Timestamp set timestamp
+func (s *GetDepositAddressService) Timestamp(timestamp int64) *GetDepositAddressService {
+	s.timestamp = &timestamp
+	return s
+}
+
+// Do send request
+func (s *GetDepositAddressService) Do(ctx context.Context, opts ...RequestOption) (address, addressTag, asset string, err error) {
+	r := &request{
+		method:   "GET",
+		endpoint: "/wapi/v3/depositAddress.html",
+		secType:  secTypeSigned,
+	}
+	m := params{}
+	if s.asset != nil {
+		m["asset"] = *s.asset
+	}
+	if s.status != nil {
+		m["status"] = *s.status
+	}
+	if s.recvWindow != nil {
+		m["recvWindow"] = *s.recvWindow
+	}
+	if s.timestamp != nil {
+		m["timestamp"] = *s.timestamp
+	}
+	r.setParams(m)
+
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return
+	}
+	res := new(DepositAddressResponse)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return
+	}
+	return res.Address, res.AddressTag, res.Asset, nil
+}
+
+// DepositHistoryResponse define deposit address
+type DepositAddressResponse struct {
+	Address    string `json:"address"`
+	Success    bool   `json:"success"`
+	AddressTag string `json:"addressTag"`
+	Asset      string `json:"asset"`
+}
