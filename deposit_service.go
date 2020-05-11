@@ -121,7 +121,7 @@ func (s *GetDepositAddressService) Timestamp(timestamp int64) *GetDepositAddress
 }
 
 // Do send request
-func (s *GetDepositAddressService) Do(ctx context.Context, opts ...RequestOption) (address, addressTag, asset string, err error) {
+func (s *GetDepositAddressService) Do(ctx context.Context, opts ...RequestOption) (address, addressTag string, err error) {
 	r := &request{
 		method:   "GET",
 		endpoint: "/wapi/v3/depositAddress.html",
@@ -151,7 +151,7 @@ func (s *GetDepositAddressService) Do(ctx context.Context, opts ...RequestOption
 	if err != nil {
 		return
 	}
-	return res.Address, res.AddressTag, res.Asset, nil
+	return res.Address, res.AddressTag, nil
 }
 
 // DepositHistoryResponse define deposit address
